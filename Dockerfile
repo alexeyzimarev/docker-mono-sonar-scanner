@@ -61,16 +61,13 @@ RUN set -ex; \
 RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
 # Download the sonar scanner for msbuild
-RUN wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$SONAR_SCANNER_MSBUILD_VERSION/sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-netcoreapp2.0.zip -O /opt/sonar-scanner-msbuild.zip \
+RUN wget https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/$SONAR_SCANNER_MSBUILD_VERSION/sonar-scanner-msbuild-$SONAR_SCANNER_MSBUILD_VERSION-net46.zip -O /opt/sonar-scanner-msbuild.zip \
   && mkdir -p $SONAR_SCANNER_MSBUILD_PATH \
   && mkdir -p $DOTNET_BUILD_DIR \
   && unzip /opt/sonar-scanner-msbuild.zip -d $SONAR_SCANNER_MSBUILD_PATH \
   && rm /opt/sonar-scanner-msbuild.zip \
   && chmod -R 775 $SONAR_SCANNER_MSBUILD_PATH \
   && chmod -R 775 $DOTNET_BUILD_DIR
-
-RUN wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /bin/jq \
-    && chmod +x /bin/jq
 
 ENV PATH="$SONAR_SCANNER_MSBUILD_PATH:$SONAR_SCANNER_MSBUILD_PATH/sonar-scanner-$SONAR_SCANNER_VERSION/bin:${PATH}"
 
