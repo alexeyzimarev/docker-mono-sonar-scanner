@@ -6,9 +6,11 @@ ENV SONAR_SCANNER_VERSION=3.2.0.1227 \
 	SONAR_SCANNER_MSBUILD_PATH=/opt/sonar-scanner-msbuild \
 	DOTNET_BUILD_DIR=/build_dir
 	
+
 # This part is copied from the official OpenJDK JRE 8 Dockerfile 
 # Source: https://github.com/docker-library/openjdk/blob/master/8-jre/slim/Dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \
+		wget \
 		bzip2 \
 		unzip \
 		xz-utils \
@@ -31,13 +33,6 @@ RUN { \
 RUN ln -svT "/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)" /docker-java-home
 ENV JAVA_HOME /docker-java-home/jre
 
-ENV JAVA_VERSION 8u162
-ENV JAVA_DEBIAN_VERSION 8u162-b12-1~deb9u1
-
-# see https://bugs.debian.org/775775
-# and https://github.com/docker-library/java/issues/19#issuecomment-70546872
-ENV CA_CERTIFICATES_JAVA_VERSION 20170531+nmu1
-
 RUN set -ex; \
 	\
 # deal with slim variants not having man page directories (which causes "update-alternatives" to fail)
@@ -45,11 +40,13 @@ RUN set -ex; \
 		mkdir -p /usr/share/man/man1; \
 	fi; \
 	\
-	apt-get update; \
-	apt-get install -y \
-		openjdk-8-jre-headless="$JAVA_DEBIAN_VERSION" \
-		ca-certificates-java="$CA_CERTIFICATES_JAVA_VERSION" \
-	; \
+    echo 'deb http://deb.debian.org/debian jessie-backports main' \
+      > /etc/apt/sources.list.d/jessie-backports.list; \
+	apt-get update -y;\
+	apt-get install -t \
+		jessie-backports \
+		openjdk-8-jre-headless \
+		ca-certificates-java -y; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 # verify that "docker-java-home" returns what we expect
